@@ -1,5 +1,7 @@
 
 using CrudRestaurante.Context;
+using CrudRestaurante.Repositories.Clients;
+using CrudRestaurante.Repositories.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrudRestaurante
@@ -16,6 +18,8 @@ namespace CrudRestaurante
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
             builder.Services.AddDbContext<AppDbContext>(
                 options => options.UseMySQL(builder.Configuration.GetConnectionString("DataBase"))

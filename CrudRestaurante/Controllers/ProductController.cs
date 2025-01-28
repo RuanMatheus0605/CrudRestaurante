@@ -1,6 +1,7 @@
 ﻿using CrudRestaurante.Context;
 using CrudRestaurante.Model;
 using CrudRestaurante.Model.Requests;
+using CrudRestaurante.Repositories.Product;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,75 +13,58 @@ namespace CrudRestaurante.Controllers
     public class ProductController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public ProductController(AppDbContext appDbContext)
+        private readonly IProductRepository _productRepository;
+        public ProductController(AppDbContext appDbContext, IProductRepository productRepository)
         {
             _context = appDbContext;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get() 
         {
-            List<ProductModel> products = await _context.Products.ToListAsync();
+            List<ProductModel> products = await _productRepository.GetAll();
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            ProductModel product = await _context.Products.FirstOrDefaultAsync(product => product.Id == id);
+            ProductModel product = await _productRepository.GetId(id);
             return Ok(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RequestProduct productModel)
         {
-            ProductModel newProduct = new ProductModel 
-            { 
+            ProductModel newProduct = new ProductModel
+            {
                 Name = productModel.Name,
                 Description = productModel.Description,
                 Price = productModel.Price,
             };
-            _context.Add(newProduct);
-            await _context.SaveChangesAsync();
-
-            return Ok(newProduct);
+            ProductModel createdProduct = await _productRepository.Create(newProduct);
+            return Ok(createdProduct);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Edit([FromBody] RequestProduct requestProduct, int id)
         {
-            
-            ProductModel product = await _context.Products.FirstOrDefaultAsync(product => product.Id == id);
-
-            if (product == null) 
-            {
-                throw new Exception($"Usuario para o ID: {id} não foi encontrado no banco de dados.");
-            }
-
-            product.Name = requestProduct.Name;
-            product.Description = requestProduct.Description;
-            product.Price = requestProduct.Price;
-
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
-
+            ProductModel product = await _productRepository.Edit(requestProduct, id);
             return Ok(product);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            ProductModel product = await _context.Products.FirstOrDefaultAsync(product => product.Id == id);
+            bool response = await _productRepository.Delete(id);
 
-            if (product == null)
+            if (response == false)
             {
-                return NotFound(new { Message = $"Produto com ID {id} não encontrado." });
+                return NotFound(new { Message = "Produto não encontrado" });
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(new { Message = "Produto removido com sucesso" });
         }
 
     }

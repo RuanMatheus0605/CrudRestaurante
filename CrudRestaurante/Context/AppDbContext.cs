@@ -13,6 +13,7 @@ namespace CrudRestaurante.Context
         }
 
         public DbSet<ProductModel> Products { get; set; }
+        public DbSet<ClientModel> Clients { get; set; }
 
     }
 }

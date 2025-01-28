@@ -2,16 +2,14 @@
 
 namespace CrudRestaurante.Model
 {
-    [Table("Produtos")]
-    public class ProductModel
+    [Table("Clientes")]
+    public class ClientModel
     {
         [Column("id")]
         public int Id { get; set; }
         [Column("nome")]
         public string Name { get; set; }
-        [Column("descricao")]
-        public string Description { get; set; }
-        [Column("preco")]
-        public int Price { get; set; }
+        [Column("Endereco")]
+        public string Address { get; set; }
     }
 }
