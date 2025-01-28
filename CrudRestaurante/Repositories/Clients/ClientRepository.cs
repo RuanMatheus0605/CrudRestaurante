@@ -32,14 +32,37 @@ namespace CrudRestaurante.Repositories.Clients
             return newClient;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            ClientModel clientExist = await GetId(id);
+
+            if (clientExist == null)
+            {
+                return false;
+            }
+
+            _context.Clients.Remove(clientExist);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public Task<ClientModel> Edit(RequestClient requestClient, int id)
+        public async Task<ClientModel> Edit(RequestClient requestClient, int id)
         {
-            throw new NotImplementedException();
+            ClientModel clientExist = await GetId(id);
+
+            if (clientExist == null)
+            {
+                throw new Exception($"Cliente do ID: {id} não foi encontrado no banco de dados.");
+            }
+
+            clientExist.Name = requestClient.Name;
+            clientExist.Address = requestClient.Address;
+
+            _context.Clients.Update(clientExist);
+            await _context.SaveChangesAsync();
+
+            return clientExist;
         }  
     }
 }

@@ -44,13 +44,26 @@ namespace CrudRestaurante.Controllers
             };
             ClientModel createdClient = await _clientRepository.Create(newClient);
             return Ok(createdClient);
-
-
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Edit([FromBody] RequestClient request, int id)
+        {
+            ClientModel clientEdited = await _clientRepository.Edit(request, id);
+            return Ok(clientEdited);
+        }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            bool response = await _clientRepository.Delete(id);
 
+            if (response == false)
+            {
+                return NotFound(new { Message = "Cliente não encontrado" });
+            }
 
-
+            return Ok(new { Message = "Cliente removido com sucesso" });
+        }
     }
 }
